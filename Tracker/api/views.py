@@ -1,3 +1,4 @@
+from datetime import datetime
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,7 +10,7 @@ from Tracker.api.services import (
     current_balance,
     get_income_by_category,
     get_expense_by_category,
-    expenses_by_date_range
+    get_expense_by_date_range
 )
 
 # Income CRUD operations
@@ -72,7 +73,20 @@ class ExpenseSummaryByDateRangeView(APIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        start_date = request.query_params.get('start_date')
-        end_date = request.query_params.get('end_date')
-        data = expenses_by_date_range(user, start_date, end_date)
+        start_date_str = request.query_params.get('start_date')
+        end_date_str = request.query_params.get('end_date')
+
+        if not start_date_str or not end_date_str:
+            return Response({"error": "Start date and end date are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return Response({"error": "Invalid date format. Format should be YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if start_date > end_date:
+            return Response({"error": "Start date cannot be after end date."}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = list(get_expense_by_date_range(user, start_date, end_date))
         return Response(data)
