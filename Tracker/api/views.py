@@ -13,7 +13,7 @@ from Tracker.api.services import (
     get_expense_by_date_range
 )
 
-# Income CRUD operations
+
 class IncomeListCreateView(generics.ListCreateAPIView):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
@@ -33,7 +33,7 @@ class IncomeDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
 
-# Expense CRUD operations
+
 class ExpenseListCreateView(generics.ListCreateAPIView):
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
@@ -53,7 +53,7 @@ class ExpenseDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Expense.objects.filter(user=self.request.user)
 
-# Financial summary operations
+
 class FinancialSummaryView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
